@@ -60,6 +60,3 @@ export abstract class BaseRepository<T> {
     if (error) throw error;
   }
 }
-
-
-export { BaseRepository }

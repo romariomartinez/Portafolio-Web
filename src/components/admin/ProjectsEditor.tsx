@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Plus, CreditCard as Edit2, Trash2, Save, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { repositories } from '../../repositories';
+import { supabase } from '../../lib/supabase';
 import { Database } from '../../lib/database.types';
 
 type Project = Database['public']['Tables']['projects']['Row'];
@@ -12,6 +13,7 @@ export function ProjectsEditor() {
   const [editing, setEditing] = useState<Partial<Project> | null>(null);
   const [techInput, setTechInput] = useState('');
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     loadProjects();
@@ -20,11 +22,38 @@ export function ProjectsEditor() {
   const loadProjects = async () => {
     try {
       const data = await repositories.project.getAll();
-      setProjects(data);
+      setProjects(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error loading projects:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 🖼️ Subida de imagen a Supabase
+  const handleUploadImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      setUploading(true);
+
+      const fileName = `${Date.now()}-${file.name}`;
+      const { error } = await supabase.storage
+        .from('projects-images')
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('projects-images').getPublicUrl(fileName);
+
+      setEditing({ ...editing, image_url: publicUrl });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Error al subir la imagen 😳');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -85,12 +114,11 @@ export function ProjectsEditor() {
     setEditing({ ...editing, technologies: newTech });
   };
 
-  if (loading) {
-    return <div className="text-center py-8">{t('Cargando...', 'Loading...')}</div>;
-  }
+  if (loading) return <div className="text-center py-8">{t('Cargando...', 'Loading...')}</div>;
 
   return (
     <div className="space-y-6">
+      {/* Encabezado */}
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-bold text-slate-900 dark:text-white">
           {t('Gestionar Proyectos', 'Manage Projects')}
@@ -104,6 +132,7 @@ export function ProjectsEditor() {
         </button>
       </div>
 
+      {/* Formulario */}
       {editing && (
         <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-6 space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
@@ -122,6 +151,8 @@ export function ProjectsEditor() {
               className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
+
+          {/* Descripciones */}
           <textarea
             value={editing.description_es || ''}
             onChange={(e) => setEditing({ ...editing, description_es: e.target.value })}
@@ -136,6 +167,31 @@ export function ProjectsEditor() {
             rows={3}
             className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
           />
+
+          {/* 📦 Subida de imagen */}
+          <div className="flex flex-col gap-2">
+            <label className="font-medium text-slate-700 dark:text-slate-300">
+              {t('Imagen del proyecto', 'Project Image')}
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleUploadImage}
+              className="text-slate-700 dark:text-slate-300"
+            />
+            {uploading && (
+              <p className="text-blue-500 text-sm">{t('Subiendo imagen...', 'Uploading image...')}</p>
+            )}
+            {editing.image_url && (
+              <img
+                src={editing.image_url}
+                alt="Vista previa"
+                className="w-32 h-20 object-cover mt-2 rounded-lg border border-slate-300 dark:border-slate-600"
+              />
+            )}
+          </div>
+
+          {/* Tecnologías */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               {t('Tecnologías', 'Technologies')}
@@ -163,24 +219,16 @@ export function ProjectsEditor() {
                   className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm flex items-center gap-2"
                 >
                   {tech}
-                  <button
-                    onClick={() => removeTechnology(index)}
-                    className="hover:text-red-600"
-                  >
+                  <button onClick={() => removeTechnology(index)} className="hover:text-red-600">
                     <X size={14} />
                   </button>
                 </span>
               ))}
             </div>
           </div>
-          <div className="grid md:grid-cols-3 gap-4">
-            <input
-              type="url"
-              value={editing.image_url || ''}
-              onChange={(e) => setEditing({ ...editing, image_url: e.target.value })}
-              placeholder={t('URL Imagen', 'Image URL')}
-              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-            />
+
+          {/* URLs */}
+          <div className="grid md:grid-cols-2 gap-4">
             <input
               type="url"
               value={editing.demo_url || ''}
@@ -196,6 +244,8 @@ export function ProjectsEditor() {
               className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
+
+          {/* Botones */}
           <div className="flex justify-end gap-2">
             <button
               onClick={() => setEditing(null)}
@@ -215,18 +265,22 @@ export function ProjectsEditor() {
         </div>
       )}
 
+      {/* Lista */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {projects.map((project) => (
-          <div
-            key={project.id}
-            className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden"
-          >
+          <div key={project.id} className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden">
             {project.image_url && (
-              <img src={project.image_url} alt={project.name_es} className="w-full h-32 object-cover" />
+              <img
+                src={project.image_url}
+                alt={project.name_es}
+                className="w-full h-32 object-cover"
+              />
             )}
-            <div className="p-4">
-              <h4 className="font-bold text-slate-900 dark:text-white mb-2">{project.name_es}</h4>
-              <div className="flex justify-end gap-2">
+            <div className="p-4 flex justify-between items-center">
+              <h4 className="font-bold text-slate-900 dark:text-white truncate">
+                {project.name_es}
+              </h4>
+              <div className="flex gap-2">
                 <button
                   onClick={() => startEdit(project)}
                   className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg transition-colors"

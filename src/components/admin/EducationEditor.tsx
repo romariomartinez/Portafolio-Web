@@ -27,51 +27,66 @@ export function EducationEditor() {
     }
   };
 
-  const handleSave = async () => {
+  
+
+  const startEdit = (item: Education | null) => {
+  if (item) {
+    // 👇 aseguramos que se clone todo el registro, incluyendo el id
+    setEditing({ ...item });
+  } else {
+    setEditing({
+      id: undefined, // explícito, para que el create sepa que es nuevo
+      institution_es: '',
+      institution_en: '',
+      degree_es: '',
+      degree_en: '',
+      description_es: '',
+      description_en: '',
+      start_date: '',
+      end_date: '',
+      order_index: education.length,
+    });
+  }
+};
+
+  if (loading) {
+    return <div className="text-center py-8">{t('Cargando...', 'Loading...')}</div>;
+  }
+
+  async function handleDelete(id: string): Promise<void> {
+    if (!window.confirm(t('¿Seguro que deseas eliminar este registro?', 'Are you sure you want to delete this record?'))) {
+      return;
+    }
+    try {
+      await repositories.education.delete(id);
+      await loadEducation();
+      alert('✅ Eliminado correctamente');
+    } catch (error) {
+      console.error('Error deleting education:', error);
+      alert('❌ Error al eliminar');
+    }
+  }
+
+  async function handleSave(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> {
+    event.preventDefault();
     if (!editing) return;
 
     try {
       if (editing.id) {
+        // Update existing education
         await repositories.education.update(editing.id, editing);
+        alert('✅ Actualizado correctamente');
       } else {
+        // Create new education
         await repositories.education.create(editing);
+        alert('✅ Creado correctamente');
       }
       setEditing(null);
       await loadEducation();
     } catch (error) {
       console.error('Error saving education:', error);
+      alert('❌ Error al guardar');
     }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm(t('¿Eliminar este registro?', 'Delete this record?'))) return;
-
-    try {
-      await repositories.education.delete(id);
-      await loadEducation();
-    } catch (error) {
-      console.error('Error deleting education:', error);
-    }
-  };
-
-  const startEdit = (item: Education | null) => {
-    setEditing(
-      item || {
-        institution_es: '',
-        institution_en: '',
-        degree_es: '',
-        degree_en: '',
-        description_es: '',
-        description_en: '',
-        start_date: '',
-        end_date: '',
-        order_index: education.length,
-      }
-    );
-  };
-
-  if (loading) {
-    return <div className="text-center py-8">{t('Cargando...', 'Loading...')}</div>;
   }
 
   return (

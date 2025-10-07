@@ -21,7 +21,7 @@ export function AdminLogin() {
       if (error) {
         setError(t('Credenciales inválidas', 'Invalid credentials'));
       }
-    } catch (err) {
+    } catch {
       setError(t('Error al iniciar sesión', 'Error signing in'));
     } finally {
       setLoading(false);
