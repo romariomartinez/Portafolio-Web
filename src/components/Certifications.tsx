@@ -36,9 +36,13 @@ export function Certifications() {
     <section className="py-20 bg-white dark:bg-slate-900">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-12 text-center">
-            {t('Certificaciones', 'Certifications')}
-          </h2>
+          <h2
+  className="text-3xl sm:text-4xl font-semibold tracking-tight 
+  text-slate-900 dark:text-white mb-10 text-center transition-colors duration-300"
+  style={{ fontFamily: 'Poppins, sans-serif' }}
+>
+  {t('Certificaciones', 'Certifications')}
+</h2>
 
           <div className="grid md:grid-cols-2 gap-6">
             {certifications.map((cert) => (

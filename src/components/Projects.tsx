@@ -31,9 +31,13 @@ export function Projects() {
     <section id="projects" className="py-20 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto text-center mb-12">
-          <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-3">
-            {t('Proyectos', 'Projects')}
-          </h2>
+         <h2
+  className="text-3xl sm:text-4xl font-semibold tracking-tight 
+  text-slate-900 dark:text-white mb-6 transition-colors duration-300"
+  style={{ fontFamily: 'Poppins, sans-serif' }}
+>
+  {t('Proyectos', 'Projects')}
+</h2>
           <p className="text-slate-600 dark:text-slate-400 text-lg">
             {t(
               'Algunos de mis desarrollos más destacados — modernos, escalables y funcionales.',

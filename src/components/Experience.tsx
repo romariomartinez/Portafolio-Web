@@ -30,9 +30,14 @@ export function Experience() {
     <section id="experience" className="py-20 bg-slate-50 dark:bg-slate-800">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-12 text-center">
-            {t('Experiencia Laboral', 'Work Experience')}
-          </h2>
+          <h2
+  className="text-3xl sm:text-4xl font-semibold tracking-tight 
+  text-slate-900 dark:text-white mb-10 text-center transition-colors duration-300"
+  style={{ fontFamily: 'Poppins, sans-serif' }}
+>
+  {t('Experiencia Laboral', 'Work Experience')}
+</h2>
+
 
           {loading ? (
             <div className="text-center text-slate-600 dark:text-slate-400">
