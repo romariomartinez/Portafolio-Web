@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Award } from 'lucide-react';
+import { Award, FileText } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { repositories } from '../repositories';
 import { Database } from '../lib/database.types';
 
-type Certification = Database['public']['Tables']['certifications']['Row'];
+type Certification = Database['public']['Tables']['certifications']['Row'] & {
+  pdf_url?: string;
+};
 
 export function Certifications() {
   const { language, t } = useLanguage();
@@ -42,14 +44,17 @@ export function Certifications() {
             {certifications.map((cert) => (
               <div
                 key={cert.id}
-                className="bg-slate-50 dark:bg-slate-800 rounded-xl p-6 hover:shadow-lg transition-shadow duration-300"
+                onClick={() => cert.pdf_url && window.open(cert.pdf_url, '_blank')}
+                className={`cursor-pointer bg-slate-50 dark:bg-slate-800 rounded-xl p-6 
+                hover:shadow-blue-500/20 transition-all duration-300 border border-transparent 
+                hover:border-blue-500/40 group`}
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-amber-100 dark:bg-amber-900 rounded-lg">
+                  <div className="p-3 bg-amber-100 dark:bg-amber-900 rounded-lg group-hover:scale-105 transition-transform duration-200">
                     <Award className="text-amber-600 dark:text-amber-400" size={24} />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 group-hover:text-blue-400">
                       {language === 'es' ? cert.name_es : cert.name_en}
                     </h3>
                     {(cert.issuer_es || cert.issuer_en) && (
@@ -61,6 +66,12 @@ export function Certifications() {
                       <p className="text-sm text-slate-500 dark:text-slate-400">
                         {cert.date}
                       </p>
+                    )}
+                    {cert.pdf_url && (
+                      <div className="flex items-center gap-2 mt-3 text-blue-500 text-sm font-medium">
+                        <FileText size={16} />
+                        <span>{t('Ver certificado', 'View certificate')}</span>
+                      </div>
                     )}
                   </div>
                 </div>

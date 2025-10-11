@@ -60,10 +60,10 @@ export function EducationEditor() {
     try {
       await repositories.education.delete(id);
       await loadEducation();
-      alert('✅ Eliminado correctamente');
+      alert('Eliminado correctamente');
     } catch (error) {
       console.error('Error deleting education:', error);
-      alert('❌ Error al eliminar');
+      alert('Error al eliminar');
     }
   }
 
@@ -75,17 +75,17 @@ export function EducationEditor() {
       if (editing.id) {
         // Update existing education
         await repositories.education.update(editing.id, editing);
-        alert('✅ Actualizado correctamente');
+        alert('Actualizado correctamente');
       } else {
         // Create new education
         await repositories.education.create(editing);
-        alert('✅ Creado correctamente');
+        alert('Creado correctamente');
       }
       setEditing(null);
       await loadEducation();
     } catch (error) {
       console.error('Error saving education:', error);
-      alert('❌ Error al guardar');
+      alert('Error al guardar');
     }
   }
 

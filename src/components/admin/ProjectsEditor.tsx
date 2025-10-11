@@ -30,7 +30,7 @@ export function ProjectsEditor() {
     }
   };
 
-  // 🖼️ Subida de imagen a Supabase
+  // Subida de imagen a Supabase
   const handleUploadImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const file = event.target.files?.[0];
@@ -51,7 +51,7 @@ export function ProjectsEditor() {
       setEditing({ ...editing, image_url: publicUrl });
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Error al subir la imagen 😳');
+      alert('Error al subir la imagen');
     } finally {
       setUploading(false);
     }
@@ -168,7 +168,7 @@ export function ProjectsEditor() {
             className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
           />
 
-          {/* 📦 Subida de imagen */}
+          {/* Subida de imagen */}
           <div className="flex flex-col gap-2">
             <label className="font-medium text-slate-700 dark:text-slate-300">
               {t('Imagen del proyecto', 'Project Image')}

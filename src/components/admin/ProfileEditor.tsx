@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Save, Upload } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { repositories } from '../../repositories';
 import { Database } from '../../lib/database.types';
+import { supabase } from '../../lib/supabase';
+
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -24,6 +26,7 @@ export function ProfileEditor() {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -33,9 +36,7 @@ export function ProfileEditor() {
   const loadProfile = async () => {
     try {
       const data = await repositories.profile.getFirst();
-      if (data) {
-        setProfile(data);
-      }
+      if (data) setProfile(data);
     } catch (error) {
       console.error('Error loading profile:', error);
     } finally {
@@ -46,7 +47,6 @@ export function ProfileEditor() {
   const handleSave = async () => {
     setSaving(true);
     setMessage('');
-
     try {
       if (profile.id) {
         await repositories.profile.update(profile.id, profile);
@@ -56,8 +56,8 @@ export function ProfileEditor() {
       setMessage(t('Guardado exitosamente', 'Saved successfully'));
       await loadProfile();
     } catch (error) {
-      setMessage(t('Error al guardar', 'Error saving'));
       console.error('Error saving profile:', error);
+      setMessage(t('Error al guardar', 'Error saving'));
     } finally {
       setSaving(false);
     }
@@ -73,6 +73,7 @@ export function ProfileEditor() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {/* Campos básicos */}
       <div className="grid md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -147,31 +148,70 @@ export function ProfileEditor() {
         </div>
       </div>
 
+      {/* Subida de imagen */}
       <div>
         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-          {t('Foto de Perfil (URL)', 'Profile Photo (URL)')}
+          {t('Foto de Perfil', 'Profile Photo')}
         </label>
-        <div className="flex gap-4 items-start">
+
+        <div className="flex flex-col sm:flex-row gap-4 items-start">
           <input
-            type="url"
-            value={profile.photo_url || ''}
-            onChange={(e) => handleImageUrlChange(e.target.value)}
-            placeholder="https://example.com/photo.jpg"
-            className="flex-1 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+            type="file"
+            accept="image/*"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+
+              setUploading(true);
+
+              try {
+                const fileName = `${Date.now()}-${file.name}`;
+                const { error } = await supabase.storage
+                  .from('profile-photos')
+                  .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false,
+                  });
+
+                if (error) throw error;
+
+                const { data } = supabase.storage
+                  .from('profile-photos')
+                  .getPublicUrl(fileName);
+
+                handleImageUrlChange(data.publicUrl);
+                alert('Imagen subida correctamente');
+              } catch (err) {
+                console.error('Error al subir imagen:', err);
+                alert('Error al subir la imagen.');
+              } finally {
+                setUploading(false);
+              }
+            }}
+            className="flex-1 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white cursor-pointer"
           />
-          {profile.photo_url && (
-            <img
-              src={profile.photo_url}
-              alt="Preview"
-              className="w-16 h-16 rounded-lg object-cover border-2 border-slate-300 dark:border-slate-600"
-            />
+
+          {uploading ? (
+            <span className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+              Subiendo imagen...
+            </span>
+          ) : (
+            profile.photo_url && (
+              <img
+                src={profile.photo_url}
+                alt="Vista previa"
+                className="w-16 h-16 rounded-lg object-cover border-2 border-slate-300 dark:border-slate-600 shadow-md"
+              />
+            )
           )}
         </div>
+
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          {t('Ingresa la URL de una imagen (ej: desde Unsplash, Pexels, etc.)', 'Enter an image URL (e.g. from Unsplash, Pexels, etc.)')}
+          {t('Sube una imagen desde tu computadora (JPG o PNG)', 'Upload an image from your computer (JPG or PNG)')}
         </p>
       </div>
 
+      {/* Biografía */}
       <div>
         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
           {t('Biografía (Español)', 'Bio (Spanish)')}
@@ -196,50 +236,39 @@ export function ProfileEditor() {
         />
       </div>
 
+      {/* Redes */}
       <div className="grid md:grid-cols-3 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            LinkedIn
-          </label>
-          <input
-            type="url"
-            value={profile.linkedin || ''}
-            onChange={(e) => setProfile({ ...profile, linkedin: e.target.value })}
-            className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            GitHub
-          </label>
-          <input
-            type="url"
-            value={profile.github || ''}
-            onChange={(e) => setProfile({ ...profile, github: e.target.value })}
-            className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            Website
-          </label>
-          <input
-            type="url"
-            value={profile.website || ''}
-            onChange={(e) => setProfile({ ...profile, website: e.target.value })}
-            className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
-          />
-        </div>
+        <input
+          type="url"
+          placeholder="LinkedIn"
+          value={profile.linkedin || ''}
+          onChange={(e) => setProfile({ ...profile, linkedin: e.target.value })}
+          className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+        />
+        <input
+          type="url"
+          placeholder="GitHub"
+          value={profile.github || ''}
+          onChange={(e) => setProfile({ ...profile, github: e.target.value })}
+          className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+        />
+       
       </div>
 
+      {/* Mensaje */}
       {message && (
-        <div className={`p-4 rounded-lg ${message.includes('Error') || message.includes('error') ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300' : 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'}`}>
+        <div
+          className={`p-4 rounded-lg ${
+            message.includes('Error') || message.includes('error')
+              ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
+              : 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+          }`}
+        >
           {message}
         </div>
       )}
 
+      {/* Botón guardar */}
       <div className="flex justify-end">
         <button
           onClick={handleSave}

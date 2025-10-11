@@ -18,14 +18,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 👇 Obtener sesión activa al cargar
+    // Obtener sesión activa al cargar
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // 👇 Escuchar cambios de sesión (login / logout)
+    // Escuchar cambios de sesión (login / logout)
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);

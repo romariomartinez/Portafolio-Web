@@ -52,7 +52,7 @@ export function Skills() {
                     {category}
                   </h3>
 
-                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 sm:gap-8 justify-items-center place-items-center">
+                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 sm:gap-1 justify-items-center place-items-center">
 
                    {categorySkills.map((skill) => (
   <div
@@ -72,7 +72,7 @@ export function Skills() {
       />
     ) : (
       <div className="w-14 h-14 flex items-center justify-center mb-3 text-slate-500">
-        🧩
+        
       </div>
     )}
 
@@ -94,14 +94,13 @@ export function Skills() {
     <span className="text-[11px] text-slate-300 font-medium">{skill.level}%</span>
   </div>
 ))}
-
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+    </div>
+    </div>
+     ))}
+     </div>
+       )}
+     </div>
+     </div>
     </section>
   );
 }

@@ -90,7 +90,7 @@ export function SkillsEditor() {
     }
   };
 
-  // ✏️ Iniciar edición
+  // Iniciar edición
   const startEdit = (item: Skill | null) => {
     setEditing(
       item || {
@@ -105,7 +105,7 @@ export function SkillsEditor() {
     );
   };
 
-  // ⏳ Loading
+  //  Loading
   if (loading) {
     return <div className="text-center py-8">{t('Cargando...', 'Loading...')}</div>;
   }
@@ -165,7 +165,7 @@ export function SkillsEditor() {
             />
           </div>
 
-          {/* 📸 Subida de imagen */}
+          {/* Subida de imagen */}
           <div className="flex flex-col gap-2">
             <label className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
               <Upload size={18} className="text-blue-500" />
@@ -231,7 +231,7 @@ export function SkillsEditor() {
         </div>
       )}
 
-      {/* 🧱 Lista de habilidades */}
+      {/* Lista de habilidades */}
       <div className="grid md:grid-cols-2 gap-4">
         {skills.map((skill) => (
           <div

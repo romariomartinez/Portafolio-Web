@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Plus, CreditCard as Edit2, Trash2, Save, X } from 'lucide-react';
+import { Plus, Trash2, Save, X, Upload, FileText } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { repositories } from '../../repositories';
+import { supabase } from '../../lib/supabase';
 import { Database } from '../../lib/database.types';
 
-type Certification = Database['public']['Tables']['certifications']['Row'];
+type Certification = Database['public']['Tables']['certifications']['Row'] & {
+  pdf_url?: string;
+};
 
 export function CertificationsEditor() {
   const { t } = useLanguage();
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [editing, setEditing] = useState<Partial<Certification> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     loadCertifications();
@@ -27,6 +31,35 @@ export function CertificationsEditor() {
     }
   };
 
+  // Subir PDF al Storage
+  const handleUploadPdf = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const fileName = `${Date.now()}-${file.name}`;
+      const { error } = await supabase.storage
+        .from('certificates-pdf') // 👈 bucket donde se guardan los PDF
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      const { data } = supabase.storage
+        .from('certificates-pdf')
+        .getPublicUrl(fileName);
+
+      setEditing((prev) => ({ ...prev, pdf_url: data.publicUrl }));
+      alert('PDF subido correctamente');
+    } catch (err) {
+      console.error('Error al subir el PDF:', err);
+      alert('Error al subir el PDF');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Guardar o actualizar
   const handleSave = async () => {
     if (!editing) return;
     try {
@@ -42,6 +75,7 @@ export function CertificationsEditor() {
     }
   };
 
+  // 🗑 Eliminar
   const handleDelete = async (id: string) => {
     if (!confirm(t('¿Eliminar esta certificación?', 'Delete this certification?'))) return;
     try {
@@ -52,6 +86,7 @@ export function CertificationsEditor() {
     }
   };
 
+  // ✏️ Iniciar edición
   const startEdit = (item: Certification | null) => {
     setEditing(
       item || {
@@ -60,6 +95,7 @@ export function CertificationsEditor() {
         issuer_es: '',
         issuer_en: '',
         date: '',
+        pdf_url: '',
         order_index: certifications.length,
       }
     );
@@ -71,6 +107,7 @@ export function CertificationsEditor() {
 
   return (
     <div className="space-y-6">
+      {/* Encabezado */}
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-bold text-slate-900 dark:text-white">
           {t('Gestionar Certificaciones', 'Manage Certifications')}
@@ -84,6 +121,7 @@ export function CertificationsEditor() {
         </button>
       </div>
 
+      {/* Formulario de edición */}
       {editing && (
         <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-6 space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
@@ -123,6 +161,36 @@ export function CertificationsEditor() {
               className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
+
+          {/* Subida de PDF */}
+          <div>
+            <label className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-medium">
+              <Upload size={18} />
+              {t('Archivo PDF del certificado', 'Certificate PDF File')}
+            </label>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={handleUploadPdf}
+              className="mt-2"
+            />
+            {uploading && (
+              <p className="text-sm text-blue-500 mt-1">
+                {t('Subiendo archivo...', 'Uploading file...')}
+              </p>
+            )}
+            {editing.pdf_url && (
+              <a
+                href={editing.pdf_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-blue-500 hover:underline mt-2"
+              >
+                <FileText size={16} /> {t('Ver PDF', 'View PDF')}
+              </a>
+            )}
+          </div>
+
           <div className="flex justify-end gap-2">
             <button
               onClick={() => setEditing(null)}
@@ -142,6 +210,7 @@ export function CertificationsEditor() {
         </div>
       )}
 
+      {/* Lista de certificaciones */}
       <div className="grid md:grid-cols-2 gap-4">
         {certifications.map((cert) => (
           <div
@@ -152,13 +221,24 @@ export function CertificationsEditor() {
               <h4 className="font-bold text-slate-900 dark:text-white">{cert.name_es}</h4>
               <p className="text-slate-600 dark:text-slate-300">{cert.issuer_es}</p>
               <p className="text-sm text-slate-500 dark:text-slate-400">{cert.date}</p>
+
+              {cert.pdf_url && (
+                <a
+                  href={cert.pdf_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-blue-500 hover:underline mt-2"
+                >
+                  <FileText size={14} /> {t('Ver Certificado', 'View Certificate')}
+                </a>
+              )}
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => startEdit(cert)}
                 className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg transition-colors"
               >
-                <Edit2 size={18} />
+                
               </button>
               <button
                 onClick={() => handleDelete(cert.id)}
