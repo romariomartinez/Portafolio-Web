@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, Mock } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { Education } from '../Education';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -18,11 +18,11 @@ vi.mock('../../repositories', () => ({
 }));
 
 describe('Education Component', () => {
-  // 🧹 Silencia errores en consola durante los tests
+  //Silencia errores en consola durante los tests
   vi.spyOn(console, 'error').mockImplementation(() => {});
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
   const mockT = (es: string, _en: string) => es;
-  const mockUseLanguage = useLanguage as unknown as vi.Mock;
+  const mockUseLanguage = useLanguage as unknown as Mock;
 
   beforeEach(() => {
     mockUseLanguage.mockReturnValue({
@@ -36,13 +36,13 @@ describe('Education Component', () => {
   });
 
   it('muestra mensaje de carga al iniciar', async () => {
-    (repositories.education.getAll as vi.Mock).mockResolvedValue([]);
+    (repositories.education.getAll as Mock).mockResolvedValue([]);
     render(<Education />);
     expect(screen.getByText('Cargando...')).toBeInTheDocument();
   });
 
   it('renderiza correctamente la información educativa', async () => {
-    (repositories.education.getAll as vi.Mock).mockResolvedValue([
+    (repositories.education.getAll as Mock).mockResolvedValue([
       {
         id: 1,
         degree_es: 'Ingeniería de Sistemas',
@@ -67,7 +67,7 @@ describe('Education Component', () => {
   });
 
   it('maneja errores al cargar educación sin romper el componente', async () => {
-    (repositories.education.getAll as vi.Mock).mockRejectedValue(new Error('Error de carga'));
+    (repositories.education.getAll as Mock).mockRejectedValue(new Error('Error de carga'));
 
     render(<Education />);
 

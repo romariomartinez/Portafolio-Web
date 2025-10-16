@@ -1,7 +1,9 @@
+@import '@fontsource/poppins/700.css';
+@import '@fontsource/poppins/400.css'; /* o las variantes que uses */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import '@fontsource/poppins/700.css';
 
 
 @layer base {

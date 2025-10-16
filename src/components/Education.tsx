@@ -12,21 +12,23 @@ export function Education() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadEducation();
-  }, []);
+ const loadEducation = async () => {
+  try {
+    const data = await repositories.education.getAll();
+    setEducation(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error('Error loading education:', err);
+    setError(t('Error al cargar la información.', 'Error loading data.'));
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const loadEducation = async () => {
-    try {
-      const data = await repositories.education.getAll();
-      setEducation(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Error loading education:', err);
-      setError(t('Error al cargar la información.', 'Error loading data.'));
-    } finally {
-      setLoading(false);
-    }
-  };
+useEffect(() => {
+  loadEducation();
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, []); 
+
 
   return (
     <section id="education" className="py-20 bg-white dark:bg-slate-900 transition-colors duration-300">
