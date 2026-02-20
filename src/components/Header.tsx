@@ -36,13 +36,14 @@ export function Header() {
     { href: '#skills', label: t('Habilidades', 'Skills') },
     { href: '#projects', label: t('Proyectos', 'Projects') },
     { href: '#certifications', label: t('Certificaciones', 'Certifications') },
+    { href: '#contact', label: t('Contacto', 'Contact') },
   ];
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-md py-2 border-b border-slate-200 dark:border-slate-700'
+          ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-md py-3 border-b border-slate-200 dark:border-slate-700/50'
           : 'bg-transparent py-4'
       }`}
     >

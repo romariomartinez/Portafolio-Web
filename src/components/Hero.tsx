@@ -41,9 +41,14 @@ export function Hero() {
 
   return (
     <section
-      id="home"
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 pt-20"
+      id="about"
+      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pt-20 relative overflow-hidden"
     >
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-200/30 dark:bg-primary-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-200/30 dark:bg-accent-500/10 rounded-full blur-3xl"></div>
+      </div>
       <div className="container mx-auto px-6 py-20">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           
@@ -53,7 +58,7 @@ export function Hero() {
               {profile?.full_name || 'Romario Martinez'}
             </h1>
 
-            <p className="text-xl sm:text-2xl text-slate-600 dark:text-slate-300">
+            <p className="text-xl sm:text-2xl text-slate-600 dark:text-slate-300 font-medium">
               {language === 'es' ? profile?.title_es : profile?.title_en}
             </p>
 
@@ -138,6 +143,8 @@ export function Hero() {
                 }
                 alt={profile?.full_name || 'Profile'}
                 className="relative w-full h-full rounded-full object-cover border-8 border-white dark:border-slate-800 shadow-2xl"
+                loading="lazy"
+                decoding="async"
               />
             </div>
           </div>

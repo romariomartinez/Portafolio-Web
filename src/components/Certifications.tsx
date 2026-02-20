@@ -33,7 +33,7 @@ export function Certifications() {
   }
 
   return (
-    <section className="py-20 bg-white dark:bg-slate-900">
+    <section id="certifications" className="py-20 bg-white dark:bg-slate-900">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
           <h2
@@ -49,6 +49,10 @@ export function Certifications() {
               <div
                 key={cert.id}
                 onClick={() => cert.pdf_url && window.open(cert.pdf_url, '_blank')}
+                onKeyDown={(e) => e.key === 'Enter' && cert.pdf_url && window.open(cert.pdf_url, '_blank')}
+                role="button"
+                tabIndex={0}
+                aria-label={cert.pdf_url ? (language === 'es' ? `Ver certificado: ${cert.name_es}` : `View certificate: ${cert.name_en}`) : undefined}
                 className={`cursor-pointer bg-slate-50 dark:bg-slate-800 rounded-xl p-6 
                 hover:shadow-blue-500/20 transition-all duration-300 border border-transparent 
                 hover:border-blue-500/40 group`}

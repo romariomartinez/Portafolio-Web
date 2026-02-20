@@ -59,7 +59,7 @@ export function Projects() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="relative group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+                className="relative group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
               >
                 {/* Imagen */}
                 {project.image_url && (
@@ -68,6 +68,8 @@ export function Projects() {
                       src={project.image_url}
                       alt={language === 'es' ? project.name_es : project.name_en}
                       className="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                      decoding="async"
                     />
                     {/* Overlay con blur */}
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 backdrop-blur-sm flex flex-col items-center justify-center gap-3 transition-all duration-300">

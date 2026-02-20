@@ -18,6 +18,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Verificar que Supabase esté configurado
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     // Obtener sesión activa al cargar
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -38,11 +44,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    if (!supabase) {
+      return { error: new Error('Supabase no configurado') };
+    }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error };
   };
 
   const signOut = async () => {
+    if (!supabase) return;
     await supabase.auth.signOut();
   };
 
@@ -60,4 +70,3 @@ export function useAuth() {
   }
   return context;
 }
-

@@ -95,7 +95,14 @@ export function Skills() {
                         </p>
 
                         {/* Barra de progreso */}
-                        <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden mb-1">
+                        <div 
+                          className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden mb-1"
+                          role="progressbar"
+                          aria-valuenow={skill.level}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`Nivel de ${language === 'es' ? skill.name_es : skill.name_en}: ${skill.level}%`}
+                        >
                           <div
                             className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-700 ease-out"
                             style={{ width: `${skill.level}%` }}

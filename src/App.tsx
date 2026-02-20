@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -9,8 +9,10 @@ import { Experience } from "./components/Experience";
 import { Skills } from "./components/Skills";
 import { Projects } from "./components/Projects";
 import { Certifications } from "./components/Certifications";
+import { Contact } from "./components/Contact";
 import { AdminLogin } from "./components/admin/AdminLogin";
 import { AdminPanel } from "./components/admin/AdminPanel";
+import { analytics } from "./lib/analytics";
 
 
 function AppContent() {
@@ -48,6 +50,7 @@ function AppContent() {
         <Skills />
         <Projects />
         <Certifications />
+        <Contact />
       </main>
 
       <footer className="bg-slate-900 dark:bg-black text-white py-8">
@@ -64,6 +67,12 @@ function AppContent() {
 }
 
 export default function App() {
+  // Inicializar analytics
+  useEffect(() => {
+    analytics.init();
+    analytics.trackScrollDepth();
+  }, []);
+
   return (
     <AuthProvider>
       <ThemeProvider>
