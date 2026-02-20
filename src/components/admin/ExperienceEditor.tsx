@@ -3,6 +3,7 @@ import { Plus, CreditCard as Edit2, Trash2, Save, X } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { repositories } from '../../repositories';
 import { Database } from '../../lib/database.types';
+import { DatePicker } from '../ui/DatePicker';
 
 type Experience = Database['public']['Tables']['experience']['Row'];
 
@@ -118,19 +119,15 @@ export function ExperienceEditor() {
               placeholder={t('Cargo (Inglés)', 'Position (English)')}
               className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
-            <input
-              type="text"
+            <DatePicker
               value={editing.start_date || ''}
-              onChange={(e) => setEditing({ ...editing, start_date: e.target.value })}
+              onChange={(date) => setEditing({ ...editing, start_date: date })}
               placeholder={t('Fecha Inicio', 'Start Date')}
-              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
-            <input
-              type="text"
+            <DatePicker
               value={editing.end_date || ''}
-              onChange={(e) => setEditing({ ...editing, end_date: e.target.value })}
+              onChange={(date) => setEditing({ ...editing, end_date: date })}
               placeholder={t('Fecha Fin', 'End Date')}
-              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
           <textarea

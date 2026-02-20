@@ -3,6 +3,7 @@ import { Plus, CreditCard as Edit2, Trash2, Save, X } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { repositories } from '../../repositories';
 import { Database } from '../../lib/database.types';
+import { DatePicker } from '../ui/DatePicker';
 
 type Education = Database['public']['Tables']['education']['Row'];
 
@@ -155,22 +156,20 @@ export function EducationEditor() {
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 {t('Fecha Inicio', 'Start Date')}
               </label>
-              <input
-                type="text"
+              <DatePicker
                 value={editing.start_date || ''}
-                onChange={(e) => setEditing({ ...editing, start_date: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                onChange={(date) => setEditing({ ...editing, start_date: date })}
+                placeholder={t('Seleccionar fecha', 'Select date')}
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 {t('Fecha Fin', 'End Date')}
               </label>
-              <input
-                type="text"
+              <DatePicker
                 value={editing.end_date || ''}
-                onChange={(e) => setEditing({ ...editing, end_date: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                onChange={(date) => setEditing({ ...editing, end_date: date })}
+                placeholder={t('Seleccionar fecha', 'Select date')}
               />
             </div>
           </div>

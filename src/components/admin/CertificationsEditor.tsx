@@ -4,6 +4,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { repositories } from '../../repositories';
 import { supabase } from '../../lib/supabase';
 import { Database } from '../../lib/database.types';
+import { DatePicker } from '../ui/DatePicker';
 
 type Certification = Database['public']['Tables']['certifications']['Row'] & {
   pdf_url?: string;
@@ -153,12 +154,10 @@ export function CertificationsEditor() {
               placeholder={t('Emisor (Inglés)', 'Issuer (English)')}
               className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
-            <input
-              type="text"
+            <DatePicker
               value={editing.date || ''}
-              onChange={(e) => setEditing({ ...editing, date: e.target.value })}
+              onChange={(date) => setEditing({ ...editing, date })}
               placeholder={t('Fecha', 'Date')}
-              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
 
